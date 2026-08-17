@@ -10,6 +10,7 @@ import { ConnectorCard } from "@/components/ConnectorCard";
 import { Container } from "@/components/Container";
 import { SearchInput } from "@/components/SearchInput";
 import { SectionHeader } from "@/components/SectionHeader";
+import { SkillCard } from "@/components/SkillCard";
 import { Wordmark } from "@/components/Wordmark";
 import * as icons from "@/components/icons";
 import { CONNECTORS } from "@/content/connectors";
@@ -103,6 +104,12 @@ const Narrow = styled.div<{ $max: number }>`
   max-width: ${({ $max }) => $max}px;
 `;
 
+const Stack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
 const IconCell = styled.div`
   display: flex;
   flex-direction: column;
@@ -194,6 +201,35 @@ export default function ComponentsPage() {
               />
             </Narrow>
           </Row>
+        </Group>
+
+        <Group>
+          <Label>SkillCard — Free / Business / Enterprise</Label>
+          <Narrow $max={560}>
+            <Stack>
+              <SkillCard
+                title="Send an NDA in one motion"
+                subtitle="Get an NDA signed before the call ends."
+                team="Sales"
+                plan="Free"
+                whoRunsIt="Sales rep"
+              />
+              <SkillCard
+                title="Build and send a quote or proposal"
+                subtitle="Turn agreed pricing into something the customer can sign."
+                team="Sales"
+                plan="Business"
+                whoRunsIt="Sales rep"
+              />
+              <SkillCard
+                title="Review and respond to counterparty redlines"
+                subtitle="Handle the other side’s edits in one place."
+                team="Legal"
+                plan="Enterprise"
+                whoRunsIt="Legal counsel"
+              />
+            </Stack>
+          </Narrow>
         </Group>
 
         <Group>
