@@ -1,27 +1,50 @@
 "use client";
 
+import type { MouseEvent } from "react";
+import Link from "next/link";
 import styled, { css } from "styled-components";
-import type { Plan, Team } from "@/data/skills";
+import type { Plan, Team } from "@/content/skills";
 import { Card } from "./Card";
-import { PersonIcon } from "./icons";
+import { ArrowRightIcon, PersonIcon } from "./icons";
 
-const Shell = styled(Card)<{ $plan: Plan }>`
+const Shell = styled(Card)<{ $plan: Plan; $clickable?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 24px;
+  color: inherit;
+  text-decoration: none;
+  background: ${({ theme }) => theme.color.surface};
 
-  /* Paid plans pick up a left accent so they scan in a long list. */
+  /* Paid plans keep a left accent; the fill stays white. */
   ${({ $plan, theme }) =>
     $plan === "Business" &&
     css`
-      box-shadow: inset 4px 0 0 ${theme.color.brand};
+      box-shadow: ${theme.shadow.xs}, ${theme.shadow.lg},
+        inset 4px 0 0 ${theme.color.brand};
     `}
 
   ${({ $plan, theme }) =>
     $plan === "Enterprise" &&
     css`
-      box-shadow: inset 4px 0 0 ${theme.color.purple};
+      box-shadow: ${theme.shadow.xs}, ${theme.shadow.lg},
+        inset 4px 0 0 ${theme.color.purple};
+    `}
+
+  ${({ $clickable }) =>
+    $clickable &&
+    css`
+      cursor: pointer;
+      transition: transform 150ms ease-out;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid ${({ theme }) => theme.color.brand};
+        outline-offset: 2px;
+      }
     `}
 `;
 
@@ -97,6 +120,16 @@ const Runner = styled.p`
   color: ${({ theme }) => theme.color.muted};
 `;
 
+const More = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: ${({ theme }) => theme.color.brand};
+`;
+
 const PLAN_TONE: Record<Plan, "brand" | "purple" | undefined> = {
   Free: undefined,
   Business: "brand",
@@ -104,8 +137,9 @@ const PLAN_TONE: Record<Plan, "brand" | "purple" | undefined> = {
 };
 
 /**
- * Archive row for a document skill. Business and Enterprise plans get an
- * accent bar and a tinted plan badge so paid skills scan as such.
+ * Archive row for a document skill. Pass `href` only when the skill has
+ * detail — that makes the whole card a link and shows Read more.
+ * `onOpen` intercepts unmodified clicks (used to open the archive modal).
  */
 export function SkillCard({
   title,
@@ -113,15 +147,19 @@ export function SkillCard({
   team,
   plan,
   whoRunsIt,
+  href,
+  onOpen,
 }: {
   title: string;
   subtitle?: string;
   team: Team;
   plan: Plan;
   whoRunsIt: string;
+  href?: string;
+  onOpen?: () => void;
 }) {
-  return (
-    <Shell as="article" $tinted={plan !== "Free"} $plan={plan}>
+  const body = (
+    <>
       <Copy>
         <Title>{title}</Title>
         {subtitle && <Subtitle>{subtitle}</Subtitle>}
@@ -136,6 +174,39 @@ export function SkillCard({
           {whoRunsIt}
         </Runner>
       </Meta>
+      {href && (
+        <More>
+          Read more
+          <ArrowRightIcon size={16} />
+        </More>
+      )}
+    </>
+  );
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!onOpen) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    onOpen();
+  };
+
+  if (href) {
+    return (
+      <Shell
+        as={Link}
+        href={href}
+        onClick={handleClick}
+        $plan={plan}
+        $clickable
+      >
+        {body}
+      </Shell>
+    );
+  }
+
+  return (
+    <Shell as="article" $plan={plan}>
+      {body}
     </Shell>
   );
 }

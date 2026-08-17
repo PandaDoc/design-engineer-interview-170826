@@ -31,6 +31,10 @@ export type Skill = {
   detail?: SkillDetail;
 };
 
+export function getSkill(id: string): Skill | undefined {
+  return SKILLS.find((skill) => skill.id === id);
+}
+
 /** Document workflows this product is built around. */
 export const SKILLS: Skill[] = [
   {

@@ -4,15 +4,28 @@ import { useState } from "react";
 import styled, { css } from "styled-components";
 import { Chip } from "@/components/Chip";
 import { Container } from "@/components/Container";
+import { Modal } from "@/components/Modal";
 import { SearchInput } from "@/components/SearchInput";
 import { SkillCard } from "@/components/SkillCard";
-import { PLANS, SKILLS, TEAMS, type Plan, type Team } from "@/data/skills";
+import { SkillDetail } from "@/components/SkillDetail";
+import {
+  PLANS,
+  SKILLS,
+  TEAMS,
+  getSkill,
+  type Plan,
+  type Team,
+} from "@/content/skills";
+
 import { NavHeader } from "@/sections/NavHeader";
 import { SiteFooter } from "@/sections/SiteFooter";
 import { PRODUCT_NAME } from "@/theme";
 
+const AGENT = PRODUCT_NAME.toLowerCase();
+const INSTALL = `${AGENT} add --all skills`;
+
 const Hero = styled.section`
-  background: ${({ theme }) => theme.color.brand};
+  background: ${({ theme }) => theme.color.dark};
   padding: 96px 0;
 `;
 
@@ -20,6 +33,7 @@ const HeroStack = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 32px;
   text-align: center;
 `;
 
@@ -36,7 +50,7 @@ const Eyebrow = styled.p`
   line-height: 20px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.color.brandFoam};
+  color: ${({ theme }) => theme.color.faint};
 `;
 
 const Title = styled.h1`
@@ -53,9 +67,30 @@ const Title = styled.h1`
   }
 `;
 
+const Accent = styled.span`
+  color: ${({ theme }) => theme.color.brandBright};
+`;
+
 const Subtitle = styled.p`
   font-size: 18px;
   line-height: 27px;
+  color: ${({ theme }) => theme.color.faint};
+`;
+
+const Install = styled.p`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ theme }) => theme.color.darkPanel};
+  font-family: ${({ theme }) => theme.font.mono};
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.color.surface};
+`;
+
+const Prompt = styled.span`
   color: ${({ theme }) => theme.color.brandFoam};
 `;
 
@@ -218,6 +253,7 @@ export default function SkillsPage() {
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState<TeamFilter>("all");
   const [plan, setPlan] = useState<PlanFilter>("all");
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const q = query.trim().toLowerCase();
   const filtered = SKILLS.filter(
@@ -226,6 +262,7 @@ export default function SkillsPage() {
       (team === "all" || skill.team === team) &&
       (plan === "all" || skill.plan === plan),
   );
+  const openSkill = openId ? getSkill(openId) : undefined;
 
   return (
     <>
@@ -235,13 +272,19 @@ export default function SkillsPage() {
           <HeroStack>
             <HeroText>
               <Eyebrow>Skills</Eyebrow>
-              <Title>Document workflows, ready to run</Title>
+              <Title>
+                Install skills to make Connector <Accent>smarter</Accent>
+              </Title>
               <Subtitle>
                 Every skill is a job your team already does — send an NDA, chase
-                a signature, file a contract. Filter by team or plan to find
-                the {PRODUCT_NAME} workflow that fits.
+                a signature, file a contract. Filter by team or plan to find the{" "}
+                {PRODUCT_NAME} workflow that fits.
               </Subtitle>
             </HeroText>
+            <Install>
+              <Prompt>$</Prompt>
+              {INSTALL}
+            </Install>
           </HeroStack>
         </Container>
       </Hero>
@@ -323,6 +366,10 @@ export default function SkillsPage() {
                       team={skill.team}
                       plan={skill.plan}
                       whoRunsIt={skill.whoRunsIt}
+                      href={skill.detail ? `/skills/${skill.id}` : undefined}
+                      onOpen={
+                        skill.detail ? () => setOpenId(skill.id) : undefined
+                      }
                     />
                   </li>
                 ))}
@@ -330,17 +377,18 @@ export default function SkillsPage() {
             ) : (
               <EmptyState>
                 No skills found
-                {query.trim() ? (
-                  <>
-                    {" "}
-                    for &ldquo;{query.trim()}&rdquo;
-                  </>
-                ) : null}
+                {query.trim() ? <> for &ldquo;{query.trim()}&rdquo;</> : null}
               </EmptyState>
             )}
           </Column>
         </Container>
       </Archive>
+
+      {openSkill && (
+        <Modal title={openSkill.title} onClose={() => setOpenId(null)}>
+          <SkillDetail skill={openSkill} />
+        </Modal>
+      )}
 
       <SiteFooter />
     </>

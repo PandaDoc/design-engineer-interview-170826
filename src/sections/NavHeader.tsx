@@ -88,8 +88,8 @@ export function NavHeader() {
           <Wordmark />
         </LogoLink>
         <Nav>
-          <NavLink href="/skills">Skills</NavLink>
           <NavLink href="/connectors">Connectors</NavLink>
+          <NavLink href="/skills">Skills</NavLink>
         </Nav>
         <Actions>
           <SearchBox>

@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { renderWithTheme } from "@/test-utils";
 import { SkillCard } from "./SkillCard";
 
@@ -19,6 +20,8 @@ describe("SkillCard", () => {
     expect(screen.getByText("Sales")).toBeInTheDocument();
     expect(screen.getByText("Free")).toBeInTheDocument();
     expect(screen.getByText("Sales rep")).toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.queryByText(/read more/i)).not.toBeInTheDocument();
   });
 
   it("renders the subtitle when provided", () => {
@@ -43,5 +46,26 @@ describe("SkillCard", () => {
     expect(
       screen.queryByText("Get an NDA signed before the call ends."),
     ).not.toBeInTheDocument();
+  });
+
+  it("is a real link with Read more that onOpen intercepts", async () => {
+    const user = userEvent.setup();
+    const onOpen = vi.fn();
+
+    renderWithTheme(
+      <SkillCard
+        {...BASE}
+        plan="Free"
+        href="/skills/send-an-nda-in-one-motion"
+        onOpen={onOpen}
+      />,
+    );
+
+    const link = screen.getByRole("link", { name: /send an nda in one motion/i });
+    expect(link).toHaveAttribute("href", "/skills/send-an-nda-in-one-motion");
+    expect(screen.getByText(/read more/i)).toBeInTheDocument();
+
+    await user.click(link);
+    expect(onOpen).toHaveBeenCalledTimes(1);
   });
 });
