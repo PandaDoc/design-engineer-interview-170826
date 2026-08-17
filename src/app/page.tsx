@@ -4,6 +4,7 @@ import { Hero } from "@/sections/Hero";
 import { ChatShowcase } from "@/sections/ChatShowcase";
 import { ToolStrip } from "@/sections/ToolStrip";
 import { ConnectorsBand } from "@/sections/ConnectorsBand";
+import { SkillsBand } from "@/sections/SkillsBand";
 import { FaqSection } from "@/sections/FaqSection";
 import { SiteFooter } from "@/sections/SiteFooter";
 
@@ -16,6 +17,7 @@ export default function Home() {
       <ChatShowcase />
       <ToolStrip />
       <ConnectorsBand />
+      <SkillsBand />
       <FaqSection /> {/* includes the signup promo card */}
       <SiteFooter />
     </>

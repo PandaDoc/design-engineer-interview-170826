@@ -8,11 +8,16 @@ import { Card } from "@/components/Card";
 import { Chip } from "@/components/Chip";
 import { ConnectorCard } from "@/components/ConnectorCard";
 import { Container } from "@/components/Container";
+import { Modal } from "@/components/Modal";
+import { RotatingText } from "@/components/RotatingText";
 import { SearchInput } from "@/components/SearchInput";
 import { SectionHeader } from "@/components/SectionHeader";
+import { SkillCard } from "@/components/SkillCard";
+import { SkillDetail } from "@/components/SkillDetail";
 import { Wordmark } from "@/components/Wordmark";
 import * as icons from "@/components/icons";
 import { CONNECTORS } from "@/content/connectors";
+import { SKILLS } from "@/content/skills";
 import { theme } from "@/theme";
 
 const Page = styled.main`
@@ -103,6 +108,12 @@ const Narrow = styled.div<{ $max: number }>`
   max-width: ${({ $max }) => $max}px;
 `;
 
+const Stack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
 const IconCell = styled.div`
   display: flex;
   flex-direction: column;
@@ -118,6 +129,12 @@ const FAQ_DEMO = [
   { title: "Can I change these components?", body: "Yes — they're a starting point, not a contract. Extend or restyle them as your design needs." },
 ];
 
+const ROTATING_DEMO = [
+  "sending an NDA",
+  "building a quote",
+  "contract renewals",
+];
+
 const TYPE_SCALE: Array<[string, number, number, number]> = [
   // label, size, line-height, weight
   ["display 60/72 · 700", 60, 72, 700],
@@ -130,7 +147,9 @@ const TYPE_SCALE: Array<[string, number, number, number]> = [
 
 export default function ComponentsPage() {
   const [query, setQuery] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
   const demo = CONNECTORS[0];
+  const skillDemo = SKILLS[0];
 
   return (
     <Container>
@@ -197,6 +216,50 @@ export default function ComponentsPage() {
         </Group>
 
         <Group>
+          <Label>SkillCard — Free / Business / Enterprise</Label>
+          <Narrow $max={560}>
+            <Stack>
+              <SkillCard
+                title="Send an NDA in one motion"
+                subtitle="Get an NDA signed before the call ends."
+                team="Sales"
+                plan="Free"
+                whoRunsIt="Sales rep"
+                href="/skills/send-an-nda-in-one-motion"
+              />
+              <SkillCard
+                title="Build and send a quote or proposal"
+                subtitle="Turn agreed pricing into something the customer can sign."
+                team="Sales"
+                plan="Business"
+                whoRunsIt="Sales rep"
+              />
+              <SkillCard
+                title="Review and respond to counterparty redlines"
+                subtitle="Handle the other side’s edits in one place."
+                team="Legal"
+                plan="Enterprise"
+                whoRunsIt="Legal counsel"
+              />
+            </Stack>
+          </Narrow>
+        </Group>
+
+        <Group>
+          <Label>SkillDetail + Modal</Label>
+          <Row>
+            <Button $variant="secondary" $size="md" onClick={() => setModalOpen(true)}>
+              Open skill modal
+            </Button>
+          </Row>
+          {modalOpen && (
+            <Modal title={skillDemo.title} onClose={() => setModalOpen(false)}>
+              <SkillDetail skill={skillDemo} />
+            </Modal>
+          )}
+        </Group>
+
+        <Group>
           <Label>SearchInput — controlled</Label>
           <Narrow $max={320}>
             <SearchInput value={query} onChange={setQuery} placeholder="Type to test…" />
@@ -214,6 +277,13 @@ export default function ComponentsPage() {
         <Group>
           <Label>SectionHeader</Label>
           <SectionHeader eyebrow="Eyebrow" title="A centered section heading" />
+        </Group>
+
+        <Group>
+          <Label>RotatingText — cross-fades in place</Label>
+          <Intro>
+            Skills make <RotatingText items={ROTATING_DEMO} /> smarter
+          </Intro>
         </Group>
 
         <Group>
